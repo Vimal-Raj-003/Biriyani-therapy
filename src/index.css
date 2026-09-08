@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  html, body, #root {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    overflow-x: hidden;
+    background: transparent;
+  }
+}
+
+.font-calligraphy {
+  font-family: 'Great Vibes', 'Alex Brush', cursive !important;
+}
+
+.font-calligraphy-alex {
+  font-family: 'Alex Brush', cursive !important;
+}
+
+.font-calligraphy-pinyon {
+  font-family: 'Pinyon Script', cursive !important;
+}
+
+.font-calligraphy-satisfy {
+  font-family: 'Satisfy', cursive !important;
+}
