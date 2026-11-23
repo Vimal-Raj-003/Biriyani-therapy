@@ -1,114 +1,75 @@
 import React from 'react';
-import { Phone, ShoppingBag, Truck, Check, Sparkles } from 'lucide-react';
-import { CalligraphyFontId } from '../types';
-import { getCalligraphyFamily } from '../utils/calligraphy';
+import { ChevronRight, Phone } from 'lucide-react';
+import { motion } from 'motion/react';
+import { BRAND_INFO, OCCASIONS } from '../data/menu';
 
 interface DeliverySectionProps {
   onOrderClick: () => void;
   onPhoneClick: () => void;
-  calligraphyFont?: CalligraphyFontId;
 }
 
 export const DeliverySection: React.FC<DeliverySectionProps> = ({
   onOrderClick,
   onPhoneClick,
-  calligraphyFont = 'great-vibes',
 }) => {
-  const calligraphyFamily = getCalligraphyFamily(calligraphyFont);
-
-  const perfectFor = [
-    'Family Lunch',
-    'Friends Gathering',
-    'Parties & Events',
-    'Late-Night Cravings',
-  ];
-
   return (
-    <section id="delivery-section" className="w-full max-w-[800px] mx-auto px-4 py-8 sm:py-12">
-      <div 
-        className="relative rounded-3xl p-6 sm:p-8 md:p-10 text-center overflow-hidden shadow-2xl"
-        style={{
-          background: 'rgba(18, 8, 3, 0.18)',
-          backdropFilter: 'blur(3px) saturate(105%)',
-          WebkitBackdropFilter: 'blur(3px) saturate(105%)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          textShadow: '0 1px 4px rgba(0,0,0,0.45)'
-        }}
-      >
-        
-        {/* Glow and truck background accent */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
+    <section
+      id="delivery-section"
+      className="relative w-full min-h-[85vh] sm:min-h-[90vh] flex items-center py-16 sm:py-20 scroll-mt-20 pointer-events-none"
+    >
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex justify-center lg:justify-end">
+        <motion.div
+          initial={{ opacity: 0, x: 28 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          className="luxury-panel pointer-events-auto w-full max-w-[460px] xl:mr-14 rounded-[3px] p-5 sm:p-8 lg:p-9 relative"
+        >
+          <span aria-hidden="true" className="absolute top-0 right-0 w-7 h-[1.5px] bg-[#cfa355]" />
+          <span aria-hidden="true" className="absolute top-0 right-0 h-7 w-[1.5px] bg-[#cfa355]" />
 
-        {/* Small badge */}
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full border border-white/20 bg-white/10 text-xs font-bold uppercase tracking-widest text-white mb-4">
-          <Truck className="w-3.5 h-3.5 text-amber-400" />
-          <span>Doorstep Express Kitchen</span>
-        </div>
+          <h2 className="font-display uppercase text-3xl sm:text-[2.45rem] font-medium tracking-[0.03em] text-[#f4ece0] leading-[1.03]">
+            Hot. Fresh.
+            <br />
+            Delivered.
+          </h2>
 
-        {/* Headline */}
-        <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight uppercase leading-none mb-6">
-          Hot. Fresh. Delivered.
-        </h2>
-
-        {/* Content */}
-        <div className="max-w-2xl mx-auto space-y-2 text-base sm:text-lg text-white/85 leading-relaxed mb-8">
-          <p>
-            Family lunch, friends gathering, celebrations or late-night cravings—your favourite biryani is only an order away.
+          <p className="mt-3 text-sm text-[#e6d8c7]/90 leading-relaxed">
+            Freshly scooped, sealed warm to preserve the clay-pot aroma, and delivered across the city within {BRAND_INFO.deliveryWindow}.
           </p>
-          <p className="font-semibold text-white text-lg">
-            Freshly prepared, carefully packed and delivered ready to enjoy.
-          </p>
-        </div>
 
-        {/* Perfect for: pills */}
-        <div className="mb-10">
-          <span className="block text-xs font-bold uppercase tracking-widest text-amber-300/80 mb-3">
-            PERFECT FOR:
-          </span>
-          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
-            {perfectFor.map((item) => (
+          <div className="mt-5 grid grid-cols-2 gap-2.5">
+            {OCCASIONS.map((occasion) => (
               <div
-                key={item}
-                className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-black/40 border border-white/25 text-xs sm:text-sm font-bold uppercase tracking-wide text-white"
+                key={occasion}
+                className="px-3 py-2.5 rounded-[2px] border border-[#cfa355]/24 bg-[#0c0704]/55 hover:border-[#f2cb7a]/70 hover:bg-[#d9ac59]/12 hover:-translate-y-0.5 transition-all duration-250 text-[11px] uppercase tracking-[0.12em] font-medium text-[#f4ece0]"
               >
-                <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>{item}</span>
+                {occasion}
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Main CTA */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-          <button
-            type="button"
-            onClick={onOrderClick}
-            className="w-full sm:w-auto px-9 py-3.5 rounded-full bg-white text-[#180b05] hover:bg-amber-100 active:scale-95 text-base sm:text-lg font-black uppercase tracking-wider transition-all shadow-2xl cursor-pointer flex items-center justify-center space-x-2"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span>ORDER NOW</span>
-          </button>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={onOrderClick}
+              className="btn-luxury-gold flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 min-h-[46px] rounded-[2px] text-[11px] font-bold uppercase tracking-[0.18em] cursor-pointer whitespace-nowrap"
+            >
+              <span>Order Now</span>
+              <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
 
-          <button
-            type="button"
-            onClick={onPhoneClick}
-            className="w-full sm:w-auto px-7 py-3 rounded-full border-2 border-white bg-white/5 hover:bg-white/15 text-white active:scale-95 text-sm sm:text-base font-extrabold tracking-tight transition-all cursor-pointer flex items-center justify-center space-x-2.5"
-            title="Click to copy hotline"
-          >
-            <div className="w-6 h-6 rounded-full bg-white text-[#1a0c06] flex items-center justify-center">
-              <Phone className="w-3.5 h-3.5 fill-current" />
-            </div>
-            <span>0309-6747611</span>
-          </button>
-        </div>
-
-        {/* Real Flavours. Real Happiness. */}
-        <div className="pt-6 border-t border-white/15 max-w-xl mx-auto flex flex-col items-center space-y-1.5 text-center">
-          <div className="text-base sm:text-xl font-black uppercase tracking-wider text-white">
-            Real Flavours. Real Happiness.
+            <button
+              type="button"
+              onClick={onPhoneClick}
+              className="btn-luxury-ghost flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 min-h-[46px] rounded-[2px] text-[11px] font-medium tracking-[0.12em] tabular-nums cursor-pointer whitespace-nowrap"
+              title="Copy order hotline"
+            >
+              <Phone className="w-3.5 h-3.5 relative z-10 shrink-0" aria-hidden="true" />
+              <span className="relative z-10">{BRAND_INFO.hotline}</span>
+            </button>
           </div>
-        </div>
-
+        </motion.div>
       </div>
     </section>
   );

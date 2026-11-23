@@ -1,33 +1,249 @@
 @import "tailwindcss";
 
+:root {
+  --surface-base: #0a0603;
+  --surface-obsidian: #120a05;
+  --surface-footer: #080402;
+  --ink-primary: #faf4e8;
+  --ink-secondary: #ded0be;
+  --ink-muted: #a6927c;
+  --gold-champagne: #d9ac59;
+  --gold-bright: #f2cb7a;
+  --gold-deep: #9c7432;
+  --gold-ink: #120904;
+  --border-hairline: rgba(250, 244, 232, 0.14);
+  --border-gold: rgba(217, 172, 89, 0.48);
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-script: 'Great Vibes', cursive;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
 @layer base {
-  * {
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-  html, body, #root {
+  html,
+  body,
+  #root {
     width: 100%;
     min-height: 100%;
     margin: 0;
     padding: 0;
   }
+
+  html {
+    background-color: var(--surface-base);
+    color: var(--ink-primary);
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
   body {
-    overflow-x: hidden;
-    background: transparent;
+    overflow-x: clip;
+    background-color: var(--surface-base);
+    color: var(--ink-primary);
+    font-family: var(--font-sans);
+    caret-color: var(--gold-champagne);
+  }
+
+  ::selection {
+    background-color: rgba(217, 172, 89, 0.36);
+    color: var(--ink-primary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--gold-champagne);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--surface-base);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(217, 172, 89, 0.34);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(217, 172, 89, 0.62);
   }
 }
 
-.font-calligraphy {
-  font-family: 'Great Vibes', 'Alex Brush', cursive !important;
+.font-display {
+  font-family: var(--font-display);
 }
 
-.font-calligraphy-alex {
-  font-family: 'Alex Brush', cursive !important;
+.font-script {
+  font-family: var(--font-script);
 }
 
-.font-calligraphy-pinyon {
-  font-family: 'Pinyon Script', cursive !important;
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
-.font-calligraphy-satisfy {
-  font-family: 'Satisfy', cursive !important;
+/* THÉORA-inspired sharp architectural smoked-obsidian editorial panel with tactile hover glow */
+.luxury-panel {
+  background: linear-gradient(
+    150deg,
+    rgba(16, 9, 5, 0.78) 0%,
+    rgba(10, 5, 2, 0.68) 100%
+  );
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  border: 1px solid rgba(217, 172, 89, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(250, 244, 232, 0.12),
+    0 24px 60px -18px rgba(0, 0, 0, 0.82);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    background 0.35s ease;
+}
+
+.luxury-panel:hover {
+  transform: translateY(-5px);
+  border-color: rgba(242, 203, 122, 0.62);
+  background: linear-gradient(
+    150deg,
+    rgba(22, 13, 7, 0.86) 0%,
+    rgba(13, 7, 3, 0.78) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(250, 244, 232, 0.22),
+    0 28px 72px -14px rgba(0, 0, 0, 0.9),
+    0 0 28px -6px rgba(217, 172, 89, 0.28);
+}
+
+/* Sharp gold-bordered luxury ghost CTA with smooth curtain fill + periodic specular sheen */
+.btn-luxury-ghost {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(217, 172, 89, 0.72);
+  background: rgba(10, 6, 3, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #faf4e8;
+  transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.btn-luxury-ghost::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #d9ac59 0%, #f2cb7a 100%);
+  transform: translateX(-101%);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 0;
+}
+
+.btn-luxury-ghost:hover::before {
+  transform: translateX(0);
+}
+
+.btn-luxury-ghost:hover {
+  color: #120904;
+  border-color: #f2cb7a;
+  box-shadow: 0 12px 34px -10px rgba(217, 172, 89, 0.5);
+}
+
+/* Brushed champagne-gold solid architectural CTA with living specular sweep */
+.btn-luxury-gold {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #d9ac59 0%, #edd08c 50%, #c8963e 100%);
+  color: #120904;
+  box-shadow: 0 12px 32px -10px rgba(217, 172, 89, 0.48);
+  transition: transform 0.25s ease, box-shadow 0.35s ease, filter 0.3s ease;
+}
+
+.btn-luxury-gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 65%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    rgba(255, 252, 240, 0.48) 50%,
+    transparent 100%
+  );
+  animation: luxury-sheen 4.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+
+.btn-luxury-gold:hover {
+  filter: brightness(1.07);
+  box-shadow: 0 16px 40px -10px rgba(242, 203, 122, 0.65);
+}
+
+@keyframes luxury-sheen {
+  0%, 60% {
+    left: -130%;
+  }
+  100% {
+    left: 160%;
+  }
+}
+
+/* Luminous metallic gold shimmer on signature accent */
+@keyframes gold-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-gold-shimmer {
+  background: linear-gradient(
+    110deg,
+    #d9ac59 15%,
+    #fff0c2 46%,
+    #d9ac59 78%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gold-shimmer 5.2s linear infinite;
+}
+
+/* Warm golden lantern ambient pulse */
+@keyframes lantern-glow {
+  0%, 100% {
+    opacity: 0.48;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.09);
+  }
+}
+
+.animate-lantern-glow {
+  animation: lantern-glow 4.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .text-gold-shimmer,
+  .btn-luxury-gold::after,
+  .animate-lantern-glow {
+    animation: none;
+  }
+  .text-gold-shimmer {
+    background: none;
+    color: #d9ac59;
+  }
+  .btn-luxury-ghost::before {
+    transition: none;
+  }
 }

@@ -1,121 +1,125 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BiryaniBanner } from './components/BiryaniBanner';
-import { BannerToolbar } from './components/BannerToolbar';
-import { OrderModal } from './components/OrderModal';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Check } from 'lucide-react';
+import { AnimatePresence, motion, MotionConfig } from 'motion/react';
+import { ScrollBiryaniCanvas } from './components/ScrollBiryaniCanvas';
+import { SpiceAtmosphereCanvas } from './components/SpiceAtmosphereCanvas';
 import { SiteNavbar } from './components/SiteNavbar';
+import { HeroContentSection } from './components/HeroContentSection';
+import { ScrollProgressRail } from './components/ScrollProgressRail';
 import { StorySection } from './components/StorySection';
 import { WhyDifferenceSection } from './components/WhyDifferenceSection';
 import { SpecialitiesSection } from './components/SpecialitiesSection';
 import { DeliverySection } from './components/DeliverySection';
+import { FinaleRevealSection } from './components/FinaleRevealSection';
 import { SiteFooter } from './components/SiteFooter';
-import { Sparkles, Check, Phone, Utensils, Feather } from 'lucide-react';
-import { CalligraphyFontId, CalligraphyScope } from './types';
+import { OrderModal } from './components/OrderModal';
+import {
+  BRAND_INFO,
+  HERO_ACT_DURATION_MS,
+  HERO_ACTS,
+  MENU_DISHES,
+  SCROLL_CHAPTERS,
+} from './data/menu';
+import { CartMap } from './types';
 
 export default function App() {
-  const [zoom, setZoom] = useState(1);
-  const [showSpecGuide, setShowSpecGuide] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState(false);
+  const storyContainerRef = useRef<HTMLDivElement | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [calligraphyFont, setCalligraphyFont] = useState<CalligraphyFontId>('great-vibes');
-  const [calligraphyScope, setCalligraphyScope] = useState<CalligraphyScope>('signature');
-  const [scrollFraction, setScrollFraction] = useState(0);
+  const [cart, setCart] = useState<CartMap>({});
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeChapterId, setActiveChapterId] = useState<string>(SCROLL_CHAPTERS[0].id);
+
+  // Automated 4-Act Hero Cinema state (plays seamlessly on page load!)
+  const [activeHeroAct, setActiveHeroAct] = useState(0);
 
   useEffect(() => {
-    const canvas = document.getElementById('scroll-canvas') as HTMLCanvasElement;
-    if (!canvas) return;
-    const context = canvas.getContext('2d');
-    if (!context) return;
-    
-    const frameCount = 300;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (scrollProgress > 0.18) return;
 
-    const currentFrame = (index: number) => (
-      `/images/ezgif-frame-${index.toString().padStart(3, '0')}.jpg`
+    const timer = window.setTimeout(() => {
+      setActiveHeroAct((prev) => (prev + 1) % HERO_ACTS.length);
+    }, HERO_ACT_DURATION_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [activeHeroAct, scrollProgress]);
+
+  const cartCount = useMemo(
+    () => (Object.values(cart) as number[]).reduce((sum, n) => sum + n, 0),
+    [cart],
+  );
+
+  // Fade botanical floating atmosphere smoothly down during the final unobstructed Biryani reveal
+  const atmosphereIntensity = useMemo(() => {
+    if (scrollProgress < 0.72) return 1;
+    return Math.max(0.18, 1 - ((scrollProgress - 0.72) / 0.22) * 0.82);
+  }, [scrollProgress]);
+
+  // Real-time section visibility tracking for instant navbar & rail synchronization
+  useEffect(() => {
+    const ids = SCROLL_CHAPTERS.map((c) => c.id);
+    const elements = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible.length > 0) {
+          setActiveChapterId(visible[0].target.id);
+        }
+      },
+      { rootMargin: '-25% 0px -35% 0px', threshold: [0.1, 0.35, 0.6] },
     );
 
-    const images: HTMLImageElement[] = [];
-
-    for (let i = 1; i <= frameCount; i++) {
-      const img = new Image();
-      img.src = currentFrame(i);
-      images.push(img);
-    }
-
-    const drawImage = (img: HTMLImageElement) => {
-      const hRatio = canvas.width / img.width;
-      const vRatio = canvas.height / img.height;
-      const ratio = Math.max(hRatio, vRatio);
-      const centerShift_x = (canvas.width - img.width * ratio) / 2;
-      const centerShift_y = (canvas.height - img.height * ratio) / 2;
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(img, 0, 0, img.width, img.height,
-        centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
-    }
-
-    images[0].onload = function () {
-      drawImage(images[0]);
-    }
-
-    const handleScroll = () => {
-      const scrollTop = document.documentElement.scrollTop;
-      const maxScrollTop = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollFraction = maxScrollTop > 0 ? scrollTop / maxScrollTop : 0;
-      const frameIndex = Math.min(
-        frameCount - 1,
-        Math.max(0, Math.floor(scrollFraction * frameCount))
-      );
-
-      requestAnimationFrame(() => {
-        const imgToDraw = images[frameIndex];
-        if (imgToDraw && imgToDraw.complete && imgToDraw.naturalHeight !== 0) {
-          drawImage(imgToDraw);
-        } else if (imgToDraw) {
-          imgToDraw.onload = () => drawImage(imgToDraw);
-        }
-      });
-    };
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      handleScroll();
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
-    };
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
+  const handleProgressChange = useCallback((progress: number) => {
+    setScrollProgress(progress);
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage((current) => (current === msg ? null : current));
-    }, 2800);
+    window.setTimeout(() => {
+      setToastMessage((cur) => (cur === msg ? null : cur));
+    }, 2600);
   };
 
   const handleCopyPhone = () => {
-    navigator.clipboard.writeText('0309-6747611');
-    setCopiedPhone(true);
-    showToast('Phone number 0309-6747611 copied to clipboard!');
-    setTimeout(() => setCopiedPhone(false), 2400);
+    navigator.clipboard?.writeText(BRAND_INFO.hotline).catch(() => {});
+    showToast(`Hotline ${BRAND_INFO.hotline} copied`);
   };
 
-  const handleOrderClick = () => {
-    setIsOrderModalOpen(true);
+  const handleUpdateCart = (dishId: string, delta: number) => {
+    const dish = MENU_DISHES.find((d) => d.id === dishId);
+    setCart((prev) => {
+      const next = Math.max(0, (prev[dishId] || 0) + delta);
+      if (next === 0) {
+        const { [dishId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [dishId]: next };
+    });
+    if (delta > 0 && dish) {
+      showToast(`Added ${dish.name}`);
+    }
   };
 
-  const handlePrintBanner = () => {
-    window.print();
+  const handleClearCart = () => {
+    setCart({});
+    showToast('Order selection cleared');
   };
 
   const handleScrollTo = (id: string) => {
+    if (id === 'hero-section') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -127,79 +131,101 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-transparent text-white font-['DM_Sans',sans-serif] selection:bg-white/20 selection:text-white">
-      
-      {/* GLOBAL SCROLL ANIMATION BACKGROUND (z-0) */}
-      <div className="fixed inset-0 z-0 w-full h-[100vh] pointer-events-none bg-[#1b0d06]">
-        {/* The existing scroll animation canvas */}
-        <canvas id="scroll-canvas" className="w-full h-full object-cover" />
-        
-        {/* Subtle banner integration overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-        <div className="absolute -top-24 -left-20 w-96 h-96 rounded-full bg-[#f59e0b]/20 blur-3xl" />
-        <div className="absolute top-1/4 -right-16 w-80 h-80 rounded-full bg-[#d97706]/25 blur-3xl" />
-        <div className="absolute bottom-10 left-1/3 w-96 h-96 rounded-full bg-[#b45309]/30 blur-3xl" />
-        <div className="absolute bottom-0 right-10 w-80 h-80 rounded-full bg-[#ea580c]/20 blur-3xl" />
-        <div className="absolute inset-0 ring-1 ring-inset ring-white/10" />
-      </div>
-
-      {/* FOREGROUND CONTENT WRAPPER (z-10) */}
-      <div className="relative z-10 w-full flex flex-col items-center">
-        
-        {/* Toast Notification */}
-        {toastMessage && (
-          <div className="fixed top-20 right-5 z-50 bg-white text-[#1a0c06] font-bold px-4 py-2.5 rounded-full shadow-2xl border border-white/20 flex items-center space-x-2 animate-bounce">
-            <Check className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs uppercase tracking-wider">{toastMessage}</span>
-          </div>
-        )}
-
-        {/* Global Sticky Navbar */}
-        <SiteNavbar
-          onOrderClick={handleOrderClick}
-          onPhoneClick={handleCopyPhone}
-          onScrollTo={handleScrollTo}
-          calligraphyFont={calligraphyFont}
+    <MotionConfig reducedMotion="user">
+      <div className="relative min-h-screen w-full text-[#faf4e8]">
+        {/* Layer 0: Automated 4-Act 4K Hero Cinema -> Seamless Handoff into 266-Frame Scroll-Scrubbed Canvas */}
+        <ScrollBiryaniCanvas
+          storyContainerRef={storyContainerRef}
+          activeHeroAct={activeHeroAct}
+          onProgressChange={handleProgressChange}
         />
 
-        {/* HERO SECTION (100vh) */}
-        <div className="relative w-full h-[100vh] flex items-center justify-center pointer-events-none">
-          <div className="w-full h-full pointer-events-auto">
-            <BiryaniBanner
-              onOrderClick={handleOrderClick}
-              onPhoneClick={handleCopyPhone}
-              onHomeClick={() => handleScrollTo('story-section')}
-              onAboutClick={() => handleScrollTo('story-section')}
-              calligraphyFont={calligraphyFont}
-              calligraphyScope={calligraphyScope}
-            />
-          </div>
-        </div>
+        {/* Layer 1: Living 3-Plane Depth-of-Field Mint Leaves, Saffron Threads, Embers & Stage Action Bursts */}
+        <SpiceAtmosphereCanvas intensity={atmosphereIntensity} activeAct={activeHeroAct} />
 
-        {/* MAIN CONTENT (Scrolls over the fixed background) */}
-        <main className="w-full flex flex-col items-center justify-start px-3 sm:px-6 lg:px-8 py-6 space-y-12 sm:space-y-16 bg-transparent">
-          <StorySection calligraphyFont={calligraphyFont} />
-          <WhyDifferenceSection calligraphyFont={calligraphyFont} />
-          <SpecialitiesSection onOrderClick={handleOrderClick} />
+        {/* Animated THÉORA-Style Luxury Header */}
+        <SiteNavbar
+          onOrderClick={() => setIsOrderModalOpen(true)}
+          onPhoneClick={handleCopyPhone}
+          onScrollTo={handleScrollTo}
+          cartCount={cartCount}
+          scrollProgress={scrollProgress}
+          activeChapterId={activeChapterId}
+        />
+
+        {/* Desktop Cooking Chapter Progress Rail */}
+        <ScrollProgressRail
+          activeChapterId={activeChapterId}
+          onJumpTo={handleScrollTo}
+          visible={scrollProgress < 0.98}
+        />
+
+        {/* Toast Feedback */}
+        <AnimatePresence>
+          {toastMessage && (
+            <motion.div
+              role="status"
+              aria-live="polite"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.22 }}
+              className="fixed top-24 right-5 z-50 bg-[#140b06]/95 backdrop-blur-md text-[#faf4e8] px-4 py-2.5 rounded-[2px] border border-[#d9ac59]/55 shadow-2xl flex items-center gap-2.5 text-xs uppercase tracking-[0.14em]"
+            >
+              <Check className="w-4 h-4 text-[#d9ac59] shrink-0" aria-hidden="true" />
+              <span>{toastMessage}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Scroll-Scrubbed Story Container */}
+        <main ref={storyContainerRef} className="relative z-10 w-full">
+          <HeroContentSection
+            activeAct={activeHeroAct}
+            onOrderClick={() => setIsOrderModalOpen(true)}
+            onStartJourneyClick={() => handleScrollTo('story-section')}
+          />
+
+          <StorySection />
+
+          <WhyDifferenceSection />
+
+          <SpecialitiesSection
+            cart={cart}
+            onUpdateCart={handleUpdateCart}
+            onOpenOrderModal={() => setIsOrderModalOpen(true)}
+          />
+
           <DeliverySection
-            onOrderClick={handleOrderClick}
+            onOrderClick={() => setIsOrderModalOpen(true)}
             onPhoneClick={handleCopyPhone}
-            calligraphyFont={calligraphyFont}
+          />
+
+          {/* 100% Unobstructed Final Biryani Reveal before Footer */}
+          <FinaleRevealSection
+            onOrderClick={() => setIsOrderModalOpen(true)}
+            onPhoneClick={handleCopyPhone}
           />
         </main>
 
+        {/* THÉORA-Inspired Centered Gold-Crest Architectural Footer */}
         <SiteFooter
           onScrollToTop={handleScrollToTop}
-          onOrderClick={handleOrderClick}
+          onScrollTo={handleScrollTo}
+          onOrderClick={() => setIsOrderModalOpen(true)}
           onPhoneClick={handleCopyPhone}
         />
-      </div>
 
-      {/* Order & Contact Modal */}
-      <OrderModal
-        isOpen={isOrderModalOpen}
-        onClose={() => setIsOrderModalOpen(false)}
-      />
-    </div>
+        {/* Interactive Order Modal */}
+        <OrderModal
+          isOpen={isOrderModalOpen}
+          onClose={() => setIsOrderModalOpen(false)}
+          cart={cart}
+          onUpdateCart={handleUpdateCart}
+          onClearCart={handleClearCart}
+          onCopyHotline={handleCopyPhone}
+        />
+      </div>
+    </MotionConfig>
   );
 }

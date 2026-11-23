@@ -1,39 +1,29 @@
-export interface BannerProps {
-  scale?: number;
-  showGrid?: boolean;
-  onOrderClick?: () => void;
-  onPhoneClick?: () => void;
-  onHomeClick?: () => void;
-  onAboutClick?: () => void;
-  onMenuClick?: () => void;
-  className?: string;
-}
-
-export interface MenuItem {
+export interface DishItem {
   id: string;
   name: string;
+  subtitle: string;
   portion: string;
-  price: string;
+  price: number;
+  priceDisplay: string;
   description: string;
-  badge?: string;
+  spiceNote: string;
   popular?: boolean;
 }
 
-export interface FeatureCardItem {
-  id: string;
+export interface CraftStage {
+  step: string;
   title: string;
-  description: string;
-  iconName: string;
+  summary: string;
+  detail: string;
 }
 
-export interface SpecialityItem {
+export interface ScrollChapter {
   id: string;
-  name: string;
-  tag: string;
-  description: string;
-  priceEstimate: string;
-  serving: string;
+  label: string;
+  frameHint: string;
+  range: [number, number];
 }
 
-export type CalligraphyFontId = 'great-vibes' | 'alex-brush' | 'pinyon' | 'satisfy';
-export type CalligraphyScope = 'signature' | 'full' | 'subtitles';
+export interface CartMap {
+  [dishId: string]: number;
+}

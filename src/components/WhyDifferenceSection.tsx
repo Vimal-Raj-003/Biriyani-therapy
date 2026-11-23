@@ -1,100 +1,85 @@
-import React from 'react';
-import { Sparkles, Utensils, Wind, HeartHandshake } from 'lucide-react';
-import { CalligraphyFontId } from '../types';
-import { getCalligraphyFamily } from '../utils/calligraphy';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { CRAFT_STAGES } from '../data/menu';
 
-interface WhyDifferenceSectionProps {
-  calligraphyFont?: CalligraphyFontId;
-}
-
-export const WhyDifferenceSection: React.FC<WhyDifferenceSectionProps> = ({
-  calligraphyFont = 'great-vibes',
-}) => {
-  const calligraphyFamily = getCalligraphyFamily(calligraphyFont);
-
-  const cards = [
-    {
-      id: 'premium-ingredients',
-      title: 'Premium Ingredients',
-      description: 'Quality rice, fresh meat, aromatic spices and carefully selected ingredients.',
-      icon: Sparkles,
-      accent: 'text-amber-400',
-    },
-    {
-      id: 'perfectly-cooked',
-      title: 'Perfectly Cooked',
-      description: 'Slow-cooked to bring every layer of rice, masala and meat together.',
-      icon: Utensils,
-      accent: 'text-orange-400',
-    },
-    {
-      id: 'rich-aroma',
-      title: 'Rich in Aroma & Flavour',
-      description: 'Every pot opens with the unmistakable fragrance of freshly prepared biryani.',
-      icon: Wind,
-      accent: 'text-amber-300',
-    },
-    {
-      id: 'made-fresh',
-      title: 'Made Fresh With Love',
-      description: 'Prepared fresh so every serving reaches you warm, flavourful and satisfying.',
-      icon: HeartHandshake,
-      accent: 'text-rose-400',
-    },
-  ];
+export const WhyDifferenceSection: React.FC = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section id="why-us-section" className="w-full max-w-[1120px] mx-auto px-4 py-8 sm:py-12 text-center">
-      
-      {/* Small title */}
-      <div className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-400 mb-2">
-        <span className="w-2 h-2 rounded-full bg-amber-400" />
-        <span>WHY CHOOSE US</span>
-      </div>
-
-      {/* Headline */}
-      <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight mb-8">
-        Good Ingredients. Great Biryani.
-      </h2>
-
-      {/* 4 Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        {cards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={card.id}
-              className="p-4 sm:p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 hover:border-white/30 hover:bg-black/50 transition-all flex flex-col items-center text-center shadow-lg group w-full max-w-[260px] mx-auto"
-            >
-              {/* Circular Icon with border matching banner stamps */}
-              <div className="w-13 h-13 rounded-full border-2 border-white flex items-center justify-center mb-4 group-hover:scale-105 transition-transform bg-white/5">
-                <Icon className={`w-6 h-6 ${card.accent}`} />
-              </div>
-
-              {/* Title */}
-              <h3 className="text-base sm:text-lg font-bold uppercase tracking-wider text-white mb-2 leading-snug">
-                {card.title}
-              </h3>
-
-              {/* Description */}
-              <p className="text-xs sm:text-sm text-white/75 leading-relaxed">
-                {card.description}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Section tagline with Calligraphy Style */}
-      <div className="inline-block px-6 py-2.5 rounded-full bg-white/5 border border-white/20 text-amber-200">
-        <span
-          className="text-xl sm:text-2xl font-normal tracking-wide"
-          style={{ fontFamily: calligraphyFamily }}
+    <section
+      id="craft-section"
+      className="relative w-full min-h-[95vh] sm:min-h-[100vh] flex items-center py-16 sm:py-24 scroll-mt-20 pointer-events-none"
+    >
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex justify-center lg:justify-end">
+        <motion.div
+          initial={{ opacity: 0, x: 28 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          className="luxury-panel pointer-events-auto w-full max-w-[460px] xl:mr-14 rounded-[3px] p-5 sm:p-8 lg:p-9 relative"
         >
-          “You’ll smell the difference before the first bite.”
-        </span>
-      </div>
+          <span aria-hidden="true" className="absolute top-0 right-0 w-7 h-[1.5px] bg-[#cfa355]" />
+          <span aria-hidden="true" className="absolute top-0 right-0 h-7 w-[1.5px] bg-[#cfa355]" />
 
+          <h2 className="font-display uppercase text-3xl sm:text-[2.45rem] font-medium tracking-[0.03em] text-[#f4ece0] leading-[1.03]">
+            Craft &amp; Story.
+          </h2>
+
+          <p className="mt-2 font-display italic text-lg text-[#cfa355]">
+            “You will smell the difference before the first bite.”
+          </p>
+
+          <div className="mt-6 divide-y divide-[#cfa355]/18">
+            {CRAFT_STAGES.map((stage, idx) => {
+              const isOpen = activeIndex === idx;
+              return (
+                <button
+                  key={stage.step}
+                  type="button"
+                  onClick={() => setActiveIndex(idx)}
+                  onMouseEnter={() => setActiveIndex(idx)}
+                  aria-expanded={isOpen}
+                  className="w-full text-left py-3.5 px-2.5 -mx-2.5 rounded-[2px] hover:bg-[#d9ac59]/[0.08] transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-baseline gap-3.5">
+                    <span
+                      className={`font-display text-lg tabular-nums transition-colors ${
+                        isOpen ? 'text-[#cfa355]' : 'text-[#9f8c76]'
+                      }`}
+                    >
+                      {stage.step}
+                    </span>
+                    <div className="flex-1">
+                      <div
+                        className={`text-sm font-semibold uppercase tracking-[0.08em] transition-colors ${
+                          isOpen ? 'text-[#f4ece0]' : 'text-[#d4c4b0] group-hover:text-[#f4ece0]'
+                        }`}
+                      >
+                        {stage.title}
+                      </div>
+                      <div className="text-xs text-[#9f8c76] mt-0.5">{stage.summary}</div>
+
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.p
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden text-xs sm:text-[0.84rem] text-[#e6d8c7] leading-relaxed pt-2"
+                          >
+                            {stage.detail}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 };
